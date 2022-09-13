@@ -1,5 +1,6 @@
 package Main;
 
+import Location.Message;
 import UI.LoginWindow;
 
 public class Main {
@@ -27,7 +28,9 @@ public class Main {
 //            e.printStackTrace();
 //        }
 
-        new LoginWindow();
+        Message message = new Message();
+
+//        new LoginWindow();
         //new NetworkMessage();
     }
 
