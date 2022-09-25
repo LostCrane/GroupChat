@@ -1,11 +1,9 @@
 package UI;
 
-
-//import Database.DatabaseAccount;
-import Network.NetworkMessage;
-import Network.NetworkAccount;
+import Network.Network;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Objects;
@@ -21,36 +19,25 @@ public class LoginWindow {
     private JTextField UserName;
     private JPasswordField PassWord;
     private CommandListener CL;
-    //private String username = "root", password = "password";
-    //private DatabaseAccount database;
-    private NetworkAccount NetAccount;
+    private Network NetAccount;
     private JFrame updateFrame;
     private String inputusername;
 
-    private int UserID;
     private int option;
 
     //更新窗口
-    private JLabel Label_update,username,password,newpassword,checknewpassword;
+    private JLabel username,password,newpassword,checknewpassword;
     private JTextField UserNameArea;
     private JPasswordField PassWordArea,newpassword1,newpassword2;
     private JButton yes,cancel;
     private update_commandLstener UpdateCL;
 
-    public static void main(String[] args) {
-        new LoginWindow();
-    }
 
     // 设置登入窗口
     public LoginWindow() {
-
-        //database=new DatabaseAccount();
-        NetAccount=new NetworkAccount();
-
-
         loginWindow = new JFrame("登录");
         // 设置登入窗口 大小
-        loginWindow.setSize(300, 200);
+        loginWindow.setSize(350, 250);
         // 设置登入窗口位置 居中
         loginWindow.setLocationRelativeTo(null);
         // TODO updatebuttontes
@@ -59,25 +46,28 @@ public class LoginWindow {
         loginWindow.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         Label_title=new JLabel("正在从服务器获取信息...");
-        Label_title.setBounds(80,0,150,20);
+        Label_title.setBounds(100,0,150,20);
         loginWindow.add(Label_title);
 
 
         // 设置 第一行的标注文字和输入窗口
         Label_User = new JLabel("用户名：");
-        Label_User.setBounds(40, 30, 50, 20);
+        Label_User.setBounds(40, 30, 50, 30);
         UserName = new JTextField();
-        UserName.setBounds(90, 30, 150, 20);
+        UserName.setBounds(90, 30, 200, 30);
+        UserName.setFont(new Font(Font.DIALOG,Font.PLAIN,20));
+
         // 将组件添加进登入窗口中
         loginWindow.add(Label_User);
         loginWindow.add(UserName);
 
         // 设置 第二行的标注文字和密码窗口
         Label_pswd = new JLabel("密码：");
-        Label_pswd.setBounds(40, 60, 50, 20);
+        Label_pswd.setBounds(40, 70, 50, 30);
         PassWord = new JPasswordField();
         PassWord.setEchoChar('*');
-        PassWord.setBounds(90, 60, 150, 20);
+        PassWord.setBounds(90, 70, 200, 30);
+        PassWord.setFont(new Font(Font.DIALOG,Font.PLAIN,20));
 
         loginWindow.add(Label_pswd);
         loginWindow.add(PassWord);
@@ -85,19 +75,19 @@ public class LoginWindow {
         // 设置 第三行的 确认\取消 按钮
         CL = new CommandListener();
         signupbutton = new JButton("登录");
-        signupbutton.setBounds(40, 85, 90, 25);
+        signupbutton.setBounds(40, 120, 100, 25);
         signupbutton.addActionListener(CL);
 
         addbutton = new JButton("注册");
-        addbutton.setBounds(150, 85, 90, 25);
+        addbutton.setBounds(190, 120, 100, 25);
         addbutton.addActionListener(CL);
 
         updatebutton = new JButton("修改密码");
-        updatebutton.setBounds(40, 120, 90, 25);
+        updatebutton.setBounds(40, 160, 100, 25);
         updatebutton.addActionListener(CL);
 
         deletebutton = new JButton("注销");
-        deletebutton.setBounds(150, 120, 90, 25);
+        deletebutton.setBounds(190, 160, 100, 25);
         deletebutton.addActionListener(CL);
 
         loginWindow.add(signupbutton);
@@ -109,17 +99,18 @@ public class LoginWindow {
         loginWindow.setVisible(true);
 
         //new NetworkConnect();
+        NetAccount=new Network();
+        NetAccount.receive(LoginWindow.this);
 
-        NetAccount.Receive(LoginWindow.this);
+        Label_title.setVisible(false);
     }
 
+
     //注册窗口
-    public void updateWindow()
-    {
+    public void updateWindow() {
         loginWindow.setVisible(false);
 
         updateFrame=new JFrame("修改密码");
-
 
         updateFrame.setVisible(true);
         updateFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
@@ -129,9 +120,6 @@ public class LoginWindow {
         updateFrame.setLocationRelativeTo(null);
 
         UpdateCL=new update_commandLstener();
-
-//        Label_update=new JLabel("修改密码");
-//        Label_update.setBounds(100,10,100,20);
 
         username=new JLabel("用户名：");
         username.setBounds(30,30,70,20);
@@ -181,72 +169,60 @@ public class LoginWindow {
 
     }
 
-    public void NetCallback(int res)
-    {
-
-           switch(option)
-           {
+    public void NetCallback(int res) {
+           switch(option) {
                case 1:
-                   if(res!=0)
-                   {
-                       //UserID=res;
+                   if(res!=0) {
                        loginWindow.dispose();
                        NetAccount.close();
                        new MainWindow(inputusername);
-//                       new MainWindow(String.valueOf(res));
                    }
-                   else
-                   {
+                   else {
                        JOptionPane.showMessageDialog(null,"用户名或密码错误，请重新输入","错误",JOptionPane.WARNING_MESSAGE);
                    }
-
                    break;
+
                case 2:
-                   if(res!=0)
-                   {
+                   if(res!=0) {
                        JOptionPane.showMessageDialog(null,"注册成功！","成功",JOptionPane.INFORMATION_MESSAGE);
                    }
-                   else
-                   {
+                   else {
                        JOptionPane.showMessageDialog(null,"注册失败","错误",JOptionPane.WARNING_MESSAGE);
                    }
                    break;
+
                case 3:
-                   if(res!=0)
-                   {
+                   if(res!=0) {
                        //updateWindow();
                    }
-                   else
-                   {
+                   else {
                        //JOptionPane.showMessageDialog(null,"没有找到对应的用户，","失败",JOptionPane.ERROR_MESSAGE);
                    }
                    break;
+
                case 4:
-                   if(res!=0)
-                   {
+                   if(res!=0) {
                        JOptionPane.showMessageDialog(null,"注销成功","成功",JOptionPane.INFORMATION_MESSAGE);
 
                    }
-                   else
-                   {
+                   else {
                        JOptionPane.showMessageDialog(null,"注销失败","失败",JOptionPane.ERROR_MESSAGE);
                    }
                    break;
+
                case 5:
-                   if(res!=0)
-                   {
-                       NetAccount.Send("3",new String(String.valueOf(UserNameArea.getText().length())),UserNameArea.getText(),new String(newpassword1.getPassword()));
+                   if(res!=0) {
+                       NetAccount.sendAccount("3",new String(String.valueOf(UserNameArea.getText().length())),UserNameArea.getText(),new String(newpassword1.getPassword()));
                     option=6;
                    }
-                   else
-                   {
+                   else {
                        JOptionPane.showMessageDialog(null,"用户名或密码输入错误","错误",JOptionPane.ERROR_MESSAGE);
 
                    }
                    break;
+
                case 6:
-                   if(res!=0)
-                   {
+                   if(res!=0) {
                        JOptionPane.showMessageDialog(null,"修改密码成功","成功",JOptionPane.INFORMATION_MESSAGE);
                    }
            }
@@ -256,77 +232,42 @@ public class LoginWindow {
 
     // 设计 监听器
     class CommandListener implements ActionListener {
-        // TODO notes
+
         public void actionPerformed(ActionEvent e) {
 
             // 返回响应的按钮
             String name = e.getActionCommand();
 
+            if(UserName.getText().length()>9) {
+                JOptionPane.showMessageDialog(null,"用户名长度不能超过9位，请重新输入","输入错误",JOptionPane.WARNING_MESSAGE);
+                return;
+            }
             switch (name) {
                 case "登录":
-                    // TODO codes
-                    if(Objects.equals(UserName.getText(), "")||PassWord.getPassword().length==0 )
-                    {
+                    if(Objects.equals(UserName.getText(), "")||PassWord.getPassword().length==0 ) {
                         JOptionPane.showMessageDialog(null,"用户名或密码不能为空，请重新输入","输入错误",JOptionPane.WARNING_MESSAGE);
                         return;
                     }
                     option=1;
                     inputusername=UserName.getText();
-                    System.out.println("AAAAAAAA"+inputusername);
-                    NetAccount.Send("1",new String(String.valueOf(UserName.getText().length())),UserName.getText(),new String(PassWord.getPassword()));
-
-
-//                    if (NetAccount.Send(1,UserName.getText().length(),UserName.getText(),new String(PassWord.getPassword())))
-//                    {
-//
-//                        //如果用户名和密码都正确，则继续
-//                        // 在这里添加另一个窗口的展开代码，和数据库调用代码
-//                        loginWindow.dispose();
-//                        new MainWindow(UserName.getText());
-//                    }
-//                    else {
-//                        // TODO codes
-//
-//                        System.out.println("用户名和密码错误，请重新输入！");
-//                        JOptionPane.showMessageDialog(null,"用户名或密码错误，请重新输入","密码错误",JOptionPane.WARNING_MESSAGE);
-//                    }
+                    NetAccount.sendAccount("1",new String(String.valueOf(UserName.getText().length())),UserName.getText(),new String(PassWord.getPassword()));
                     break;
-                // TODO 可以不要取消，改成注册，存到数据库里
+
                 case "注册":
-                    if(Objects.equals(UserName.getText(), "")||PassWord.getPassword().length==0 )
-                    {
+                    if(Objects.equals(UserName.getText(), "")||PassWord.getPassword().length==0 ) {
                         JOptionPane.showMessageDialog(null,"用户名或密码不能为空，请重新输入","输入错误",JOptionPane.WARNING_MESSAGE);
                         return;
                     }
                     option=2;
-
-                    //System.exit(0);
-//                    if(database.querySQL(UserName.getText(),new String(PassWord.getPassword())))
-//                    {
-//                        JOptionPane.showMessageDialog(null,"用户名已经存在，请重新输入","错误",JOptionPane.WARNING_MESSAGE);
-//                        break;
-//                    }
-                    NetAccount.Send("2",new String(String.valueOf(UserName.getText().length())),UserName.getText(),new String(PassWord.getPassword()));
-
-//                    if()
-//                    {
-//                        JOptionPane.showConfirmDialog(null,"注册成功！","成功",JOptionPane.INFORMATION_MESSAGE);
-//                    }
-//                    else
-//                    {
-//                        JOptionPane.showMessageDialog(null,"加入数据库失败","失败",JOptionPane.ERROR_MESSAGE);
-//                    }
+                    NetAccount.sendAccount("2",new String(String.valueOf(UserName.getText().length())),UserName.getText(),new String(PassWord.getPassword()));
                     break;
 
                 case "修改密码":
                     option=3;
                     //打开更新窗口
                     updateWindow();
-                    //NetAccount.Send("1",new String(String.valueOf(UserName.getText().length())),UserName.getText(),new String(PassWord.getPassword()));
-
-
-
                     break;
+
                 case "注销":
                     if(Objects.equals(UserName.getText(), "")||PassWord.getPassword().length==0 )
                     {
@@ -334,24 +275,7 @@ public class LoginWindow {
                         return;
                     }
                     option=4;
-                    NetAccount.Send("4",new String(String.valueOf(UserName.getText().length())),UserName.getText(),new String(PassWord.getPassword()));
-
-//                    if(!database.querySQL(UserName.getText(),new String(PassWord.getPassword())))
-//                    {
-//                        JOptionPane.showMessageDialog(null,"要删除的用户不存在","错误",JOptionPane.WARNING_MESSAGE);
-//                        break;
-//                    }
-//                    if(database.deleteSQL(UserName.getText(),new String(PassWord.getPassword())))
-//                    {
-//                        JOptionPane.showMessageDialog(null,"注销成功","成功",JOptionPane.INFORMATION_MESSAGE);
-//                    }
-//                    else
-//                    {
-//                        JOptionPane.showMessageDialog(null,"注销失败","失败",JOptionPane.ERROR_MESSAGE);
-//                    }
-
-
-
+                    NetAccount.sendAccount("4",new String(String.valueOf(UserName.getText().length())),UserName.getText(),new String(PassWord.getPassword()));
                     break;
             }
         }
@@ -363,47 +287,26 @@ public class LoginWindow {
         public void actionPerformed(ActionEvent e) {
             // 返回响应的按钮
             String name = e.getActionCommand();
-            switch (name)
-            {
+            switch (name) {
                 case "确定":
-                    //if(database.insertSQL())
-                    if(Objects.equals(UserNameArea.getText(), "")||PassWordArea.getPassword().length==0 )
-                    {
+                    if(Objects.equals(UserNameArea.getText(), "")||PassWordArea.getPassword().length==0 ) {
                         JOptionPane.showMessageDialog(null,"用户名或密码不能为空，请重新输入","输入错误",JOptionPane.WARNING_MESSAGE);
                         return;
                     }
-//                    if(!database.querySQL(UserNameArea.getText(),new String(PassWordArea.getPassword())))
-//                    {
-//                        JOptionPane.showMessageDialog(null,"用户名或密码错误","错误",JOptionPane.WARNING_MESSAGE);
-//                        break;
-//                    }
+
                     if(!new String(newpassword1.getPassword()).equals(new String(newpassword2.getPassword())))
                     {
                         JOptionPane.showMessageDialog(null,"两次输入的新密码不一致","错误",JOptionPane.WARNING_MESSAGE);
                         break;
                     }
                     option=5;
-                    NetAccount.Send("3",new String(String.valueOf(UserNameArea.getText().length())),UserNameArea.getText(),new String(newpassword1.getPassword()));
-
-//                    if(database.updateSQL(UserNameArea.getText(),new String(PassWordArea.getPassword()),new String(newpassword1.getPassword())))
-//                    {
-//                        JOptionPane.showMessageDialog(null,"密码修改成功","成功",JOptionPane.INFORMATION_MESSAGE);
-//                        updateFrame.dispose();
-//                        loginWindow.setVisible(true);
-//                    }
-//                    else
-//                    {
-//                        JOptionPane.showMessageDialog(null,"修改数据失败","错误",JOptionPane.WARNING_MESSAGE);
-//                    }
-
-
+                    NetAccount.sendAccount("3",new String(String.valueOf(UserNameArea.getText().length())),UserNameArea.getText(),new String(newpassword1.getPassword()));
                     break;
 
                 case "取消":
                     updateFrame.dispose();
                     loginWindow.setVisible(true);
                     break;
-
             }
 
         }

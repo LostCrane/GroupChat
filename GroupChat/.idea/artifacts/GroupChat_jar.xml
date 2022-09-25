@@ -7,6 +7,7 @@
       <element id="extracted-dir" path="$KOTLIN_BUNDLED$/lib/kotlin-reflect.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$KOTLIN_BUNDLED$/lib/kotlin-test.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$PROJECT_DIR$/lib/mysql-connector-java-5.1.7-bin.jar" path-in-jar="/" />
+      <element id="library" level="project" name="lib" />
     </root>
   </artifact>
 </component>
