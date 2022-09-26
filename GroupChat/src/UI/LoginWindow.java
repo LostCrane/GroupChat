@@ -212,7 +212,7 @@ public class LoginWindow {
 
                case 5:
                    if(res!=0) {
-                       NetAccount.sendAccount("3",new String(String.valueOf(UserNameArea.getText().length())),UserNameArea.getText(),new String(newpassword1.getPassword()));
+                       NetAccount.sendAccount("3",String.valueOf(UserNameArea.getText().length()),UserNameArea.getText(),new String(newpassword1.getPassword()));
                     option=6;
                    }
                    else {

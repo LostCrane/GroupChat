@@ -1,8 +1,5 @@
 package Network;
 
-import UI.LoginWindow;
-
-import javax.swing.*;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -25,9 +22,14 @@ public class Network {
     private InputStream inputStream;
 
     // 日期时间对象
-    Date date;
+    private Date date;
     // 日期时间的格式
-    SimpleDateFormat formatter;
+    private SimpleDateFormat formatter;
+    
+    // 服务器对账户操作的返回值。默认-1没有操作、0操作失败、操作成功返回正整数代表账户ID号
+    public int returnUserID = -1;
+    // 接收的 发送聊天消息的账户名
+    public String returnMessage = null;
 
 
     /**
@@ -57,10 +59,8 @@ public class Network {
     /**
      * 接收来自服务器的数据
      * 方法会根据接收到的数据流中标识位，确定是账户数据还是聊天消息
-     * @param LW LoginWindow 类的对象。账户消息使用
-     * @param ta1 TODO 介绍
      */
-    public void receive(LoginWindow LW, JTextArea ta1) {
+    public void receive() {
         // 以匿名类的方式开启线程接收数据，防止接收方法堵塞程序
         new Thread(() -> {
             try {
@@ -72,23 +72,16 @@ public class Network {
                 while ((i = inputStream.read(data)) != -1) {
                     // 截取 字节流中标识位
                     switch (data[0]) {
-                        // 标识位是 1，此流返回的是账户数据
+                        // 标识位是 1，此流返回的是账户数据.
                         case 1:
                             // 服务器返回的是 int 类型的 账户ID号
-                            LW.NetCallback( Integer.parseInt(new String(data, 1, i)) );
+                            returnUserID = Integer.parseInt(new String(data, 1, i - 1));
                             break;
                         // 标识位是 2，此流返回的是聊天信息
                         case 2:
-                            // 截取 发送此消息的账户名长度
-                            int userNameLength = Integer.parseInt(new String(data, 1, 1));
-                            // 截取 账户名
-                            String userName = new String(data, 2, userNameLength);
-                            // 截取 消息发送的时间
-                            String userDatetime = new String(data, 2 + userNameLength, 16);
-                            // 截取 聊天消息
-                            String userMassage = new String(data, 2 + userNameLength + 16, i - 2 - userNameLength - 16);
-                            // TODO 数据分开处理，还是这样打包到一起处理
-                            ta1.append(userDatetime + "  " + userName + ": " + userMassage+"\n");
+                            // 截取掉 标识位
+                            returnMessage = new String(data, 1, i - 1);
+                            break;
                     }
                 }
 
@@ -104,19 +97,17 @@ public class Network {
     /**
      * 向服务器发送关于账户的数据
      * @param purpose 数据的意图
-     * @param unit  账户名长度
      * @param userName  账户名
      * @param Password  密码
      */
-    public void sendAccount(String purpose, String unit, String userName, String Password) {
+    public void sendAccount(String purpose, String userName, String Password) {
         try {
-            // 将 数据的意图、账户名长度、账户名、密码，打包成 utf-8 格式发送
-            outputStream.write((purpose + unit + userName + Password).getBytes(StandardCharsets.UTF_8));
+            // 将 账户标识、数据的意图、账户名长度、账户名、密码，打包成 utf-8 格式发送
+            outputStream.write(( String.valueOf(1) + purpose + String.valueOf(userName.length()) + userName + Password).getBytes(StandardCharsets.UTF_8));
             // 刷新缓存流
             outputStream.flush();
 
         } catch (IOException e) {
-            // TODO 注释，关闭流
             System.out.println("Network.sendAccount() Error!");
             close();
             e.printStackTrace();
@@ -131,8 +122,8 @@ public class Network {
      */
     public void sendMessage(String userName, String message) {
         try {
-            // 将 账户名长度，账户名，聊天消息发送的时间，聊天消息，打包成 utf-8 格式发送
-            outputStream.write( ( String.valueOf(userName.length()) +userName + formatter.format(date) + message).getBytes(StandardCharsets.UTF_8) );
+            // 将 聊天标识、账户名长度、账户名、聊天消息发送的时间、聊天消息，打包成 utf-8 格式发送
+            outputStream.write(( String.valueOf(2) + String.valueOf(userName.length()) + userName + formatter.format(date) + message ).getBytes(StandardCharsets.UTF_8) );
             // 刷新缓存流
             outputStream.flush();
 
